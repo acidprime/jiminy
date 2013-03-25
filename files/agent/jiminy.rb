@@ -9,28 +9,31 @@ module MCollective
                :url         => 'http://puppetlabs.com',
                :timeout     => 120
 
-      ['pull','push'].each do |act|
+      ['push','pull','status'].each do |act|
         action act do
           validate :path, :shellsafe
-          run_git act, request[:path]
+
+          path = request[:path]
+          reply.fail "Path not found #{path}" unless File.exists?(path)
+
+          return unless reply.statuscode == 0
+          run_git act, path
         end
-      end
-      action 'status' do
-        run_git 'status'
       end
 
       private
       def run_git(action,path=nil)
+
         output = ''
         cmd = ['/usr/bin/git']
         case action
-        when 'pull','push'
-          cmd << 'pull' if action == 'pull'
+        when 'push','pull'
           cmd << 'push' if action == 'push'
-          reply[:path] = path
+          cmd << 'pull' if action == 'pull'
         when 'status'
           cmd << 'status'
         end
+        reply[:path] = path
         reply[:status] = run(cmd, :stdout => :output, :chomp => true, :cwd => path )
       end
     end

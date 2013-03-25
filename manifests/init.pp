@@ -50,7 +50,7 @@ class jiminy inherits jiminy::params {
   $agent_path = $jiminy::params::mc_agent_path
 
   file { "${agent_path}/${agent_ddl}"  :
-    source => "puppet:///modules/${module_name}/agent/${agent_name}",
+    source => "puppet:///modules/${module_name}/agent/${agent_ddl}",
   }
   file { "${agent_path}/${agent_name}" :
     source => "puppet:///modules/${module_name}/agent/${agent_name}",
