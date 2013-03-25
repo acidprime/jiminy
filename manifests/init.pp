@@ -35,7 +35,29 @@
 #
 # Copyright 2011 Your name here, unless otherwise noted.
 #
-class jiminy {
+class jiminy inherits jiminy::params {
 
+  File {
+    ensure => present,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+    notify => Service[$jiminy::params::mc_service_name],
+  }
+  
+  $agent_name = "${jiminy::params::mc_agent_name}.rb"
+  $agent_ddl  = "${jiminy::params::mc_agent_name}.ddl"
+  $agent_path = $jiminy::params::mc_agent_path
+
+  file { "${agent_path}/${agent_ddl}"  :
+    source => "puppet:///modules/${module_name}/agent/${agent_name}",
+  }
+  file { "${agent_path}/${agent_name}" :
+    source => "puppet:///modules/${module_name}/agent/${agent_name}",
+  }
+
+  service { $jiminy::params::mc_service_name :
+    ensure => running,
+  }
 
 }
