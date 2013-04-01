@@ -46,8 +46,8 @@ module MCollective
           cmd << 'environment' if action == 'environment'
           cmd << 'module'      if action == 'module'
         end
-        reply[:path] = path
-        reply[:status] = run(cmd, :stdout => :output, :chomp => true, :cwd => path )
+        reply[:path]   = path
+        reply[:status] = run(cmd, :stderr => :error, :stdout => :output, :chomp => true, :cwd => path )
       end
     end
   end

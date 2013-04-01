@@ -1,6 +1,6 @@
 class jiminy::git(
   $repo_path         = '/var/repos',
-  $vcs_module_path   = "/etc/puppetlabs/puppet/environments",
+  $vcs_module_path   = "/etc/puppetlabs/puppet/${module_name}",
   $git_server        = 'classroom.puppetlabs.vm',
 ) {
   Exec {
@@ -26,9 +26,10 @@ class jiminy::git(
   jiminy::git::repo{ 'modules': }
 
   vcsrepo { $vcs_module_path :
-      ensure => present,
+      ensure   => present,
       provider => 'git',
-      source => "ssh://${git_server}/${repo_path}/modules.git"
+      force    => true,
+      source   => "ssh://${git_server}/${repo_path}/modules.git"
   }
 
   # Configure ssh private keys on our masters

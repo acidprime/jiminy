@@ -78,6 +78,8 @@ class jiminy (
     include jiminy::git
   }
   if $setup_r10k {
-    include jiminy::r10k
+    class {'jiminy::r10k':
+      remote => "ssh://classroom.puppetlabs.vm/var/repos/modules.git",
+    }
   }
 }

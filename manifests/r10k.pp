@@ -1,4 +1,10 @@
-class jiminy::r10k {
+class jiminy::r10k(
+  $remote,
+  $cachedir   = '/var/cache/r10k',
+  $basedir    = '/etc/puppetlabs/puppet/environments',
+  $purgedirs  = $basedir,
+  $configfile = '/etc/r10k.yaml'
+){
   include 'ruby'
   include 'ruby::dev'
   #/usr/bin/gem install --include-dependencies --no-rdoc --no-ri r10k' returned 1: ERROR:  While executing gem ... (OptionParser::InvalidOption)
@@ -19,5 +25,9 @@ class jiminy::r10k {
     package { 'gcc':
       ensure => installed,
     }
+  }
+  file { $configfile :
+    ensure  => present,
+    content => template("${module_name}/${configfile}"),
   }
 }

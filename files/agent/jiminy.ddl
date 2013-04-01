@@ -23,7 +23,7 @@ metadata :name        => "jiminy",
           :optional    => false,
           :maxlength   => 256
 
-    display :always if act == 'status'
+    display :always
     output :path,
            :description => "Operating on #{act}",
            :display_as  => "Path"
@@ -32,6 +32,9 @@ metadata :name        => "jiminy",
            :description => "Output from git",
            :display_as  => "Output"
 
+    output :error,
+           :description => "Error from git",
+           :display_as  => "Errors"
   end
 end
 # vim: set syntax=ruby:
