@@ -32,6 +32,22 @@ class jiminy::git(
       source   => "ssh://${git_server}/${repo_path}/modules.git"
   }
 
+  file { '.git/hooks/pre-commit':
+    ensure  => file,
+    mode    => '0755',
+    path    => "${vcs_module_path}/.git/hooks/pre-commit",
+    source  => "puppet:///modules/${module_name}/pre-commit",
+    require => Vcsrepo[$vcs_module_path],
+  }
+
+  if ! defined(Package['puppet-lint']) {
+    package { 'puppet-lint':
+      ensure   => present,
+      provider => 'gem',
+      require  => [Class['ruby'],Class['ruby::dev']],
+    }
+  }
+
   # Configure ssh private keys on our masters
   file {'/root/.ssh':
     ensure => directory,
