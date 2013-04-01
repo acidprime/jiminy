@@ -1,8 +1,8 @@
-:cachedir: <%= cachedir %>
+:cachedir: <%= scope.lookupvar('jiminy::r10k::cachedir') %>
 :sources:
   :jiminy:
-    remote: <%= remote %>
-    basedir: <%= basedir %>
+    remote: <%= scope.lookupvar('jiminy::r10k::remote') %>
+    basedir: <%= scope.lookupvar('jiminy::r10k::basedir') %>
 
 :purgedirs:
-  - <%= purgedirs %> 
+  - <%= scope.lookupvar('jiminy::r10k::purgedirs') %>
