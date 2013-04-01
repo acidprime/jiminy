@@ -42,7 +42,7 @@ module MCollective
         when 'cache','environment','module','synchronize','sync'
           cmd = r10k
           cmd << 'cache'       if action == 'cache'
-          cmd << 'synchronize' if action == 'synchronize' or 'sync'
+          cmd << 'synchronize' if action == 'synchronize' or action == 'sync'
           cmd << 'environment' if action == 'environment'
           cmd << 'module'      if action == 'module'
         end
