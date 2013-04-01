@@ -5,17 +5,19 @@ class jiminy::r10k(
   $purgedirs  = $basedir,
   $configfile = '/etc/r10k.yaml'
 ){
-  include 'ruby'
+  # https://projects.puppetlabs.com/issues/19741
+  class {'ruby':
+    #gems_version    => '2.0.0',
+    rubygems_update => false,
+  }
   include 'ruby::dev'
-  #/usr/bin/gem install --include-dependencies --no-rdoc --no-ri r10k' returned 1: ERROR:  While executing gem ... (OptionParser::InvalidOption)
-  #    invalid option: --include-dependencies
-  #if ! defined(Package['r10k']) {
-  #  package { 'r10k':
-  #    ensure   => present,
-  #    provider => 'gem',
-  #    require  => [Class['ruby'],Class['ruby::dev']],
-  #  }
-  #}
+  if ! defined(Package['r10k']) {
+    package { 'r10k':
+      ensure   => present,
+      provider => 'gem',
+      require  => [Class['ruby'],Class['ruby::dev']],
+    }
+  }
   if ! defined(Package['make']) {
     package { 'make':
       ensure => present,
