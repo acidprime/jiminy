@@ -10,14 +10,14 @@ class jiminy::git(
     }
   }
 
-  # Create our repository path
-  file { $repo_path :
-    ensure => directory,
-  }
-
   Jiminy::Git::Repo {
     repo_path => $repo_path,
     require   => File[$repo_path],
+  }
+
+  # Create our repository path
+  file { $repo_path :
+    ensure => directory,
   }
 
   jiminy::git::repo{ 'modules': }

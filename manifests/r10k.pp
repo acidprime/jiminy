@@ -7,7 +7,6 @@ class jiminy::r10k(
 ){
   # https://projects.puppetlabs.com/issues/19741
   class {'ruby':
-    #gems_version    => '2.0.0',
     rubygems_update => false,
   }
   include 'ruby::dev'
