@@ -29,11 +29,11 @@
 #
 # === Authors
 #
-# Author Name <author@domain.com>
+# Author Name <zack@puppetlabs.com>
 #
 # === Copyright
 #
-# Copyright 2011 Your name here, unless otherwise noted.
+# Copyright 2013 Zack Smith, unless otherwise noted.
 #
 class jiminy (
   $agent_name = "${jiminy::params::mc_agent_name}.rb",
@@ -41,8 +41,10 @@ class jiminy (
   $agent_ddl  = "${jiminy::params::mc_agent_name}.ddl",
   $agent_path = $jiminy::params::mc_agent_path,
   $app_path   = $jiminy::params::mc_application_path,
-  $is_master  = str2bool($::fact_is_puppetmaster),
-  ) inherits jiminy::params {
+  $mc_service = $jiminy::params::mc_service_name,
+  $setup_git  = true,
+  $is_master  = true #str2bool($::fact_is_puppetmaster),
+) inherits jiminy::params {
 
   File {
     ensure => present,
@@ -65,9 +67,13 @@ class jiminy (
       source  => "puppet:///modules/${module_name}/agent/${agent_name}",
       require => File["${agent_path}/${agent_ddl}"],
     }
-
-    service { $jiminy::params::mc_service_name :
-      ensure => running,
+    if ! defined(Service[$mc_service]) {
+      service { $mc_service :
+        ensure => running,
+      }
     }
+  }
+  if $setup_git {
+    include jiminy::git
   }
 }
