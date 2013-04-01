@@ -22,8 +22,8 @@ module MCollective
       end
 
       private
-      def run_git(action,path=nil)
 
+      def run_git(action,path=nil)
         output = ''
         cmd = ['/usr/bin/git']
         case action
