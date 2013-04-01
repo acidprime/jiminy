@@ -3,11 +3,10 @@ class MCollective::Application::Jiminy<MCollective::Application
     if ARGV.length >= 1
       configuration[:command] = ARGV.shift
       case configuration[:command]
-      when 'push','pull'
-        configuration[:server] = ARGV.shift || docs
-      when 'status'
+      when 'push','pull','status'
+        configuration[:path] = ARGV.shift || docs
       end
-    else
+  else
       docs
     end
   end
@@ -18,33 +17,17 @@ class MCollective::Application::Jiminy<MCollective::Application
 
   def main
     mc = rpcclient("jiminy", :chomp => true)
-    options = {:server => configuration[:server]} if ['push','pull'].include? configuration[:command]
+    options = {:path => configuration[:path]} if ['push','pull','status'].include? configuration[:command]
     mc.send(configuration[:command], options).each do |resp|
       puts "#{resp[:sender]}:"
       if resp[:statuscode] == 0
-        responses, statuses = parse_lines(resp[:data][:output])
-        puts responses if responses and ['push','pull'].include? configuration[:command]
-        puts statuses if statuses and configuration[:command] == 'status'
+        responses = resp[:data][:output]
+        puts responses if responses and ['push','pull','status'].include? configuration[:command]
       else
         puts resp[:statusmsg]
       end
     end
     mc.disconnect
     printrpcstats
-  end
-
-  def parse_lines(output)
-    responses = ""
-    statuses = ""
-    output.each_line do |line|
-      case line
-      when /^\w+:/
-        responses = responses + (sprintf '%-30s', "    #{line}")
-      when /^\w+,/
-        fields = line.split(',')
-        statuses = statuses + (sprintf '%-30s %s', "    #{fields[0]}/#{fields[1]}:", "#{fields[17]}\n")
-      end
-    end
-    [responses, statuses]
   end
 end

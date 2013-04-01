@@ -52,7 +52,7 @@ class jiminy (
   }
 
   file { "${app_path}/${app_name}"  :
-    source => "puppet:///modules/${module_name}/agent/${agent_name}",
+    source => "puppet:///modules/${module_name}/application/${agent_name}",
   }
 
   file { "${agent_path}/${agent_ddl}"  :
