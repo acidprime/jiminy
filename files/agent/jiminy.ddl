@@ -6,10 +6,17 @@ metadata :name        => "jiminy",
          :url         => "http://puppetlabs.com",
          :timeout     => 120
 
-['push','pull','status'].each do |act|
+  ['push',
+   'pull',
+   'status',
+   'cache',
+   'environment',
+   'module',
+   'synchronize',
+   'sync'].each do |act|
   action act, :description => "#{act.capitalize} " do
     input :path,
-          :prompt      => "Repo path",
+          :prompt      => "Module path",
           :description => "Operating on #{act}",
           :type        => :string,
           :validation  => '.',
@@ -25,8 +32,6 @@ metadata :name        => "jiminy",
            :description => "Output from git",
            :display_as  => "Output"
 
-    #output :status,
-    #       :description => "Return status of git",
-    #       :display_as  => "Return Status"
   end
 end
+# vim: set syntax=ruby:

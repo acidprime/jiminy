@@ -8,8 +8,14 @@ module MCollective
                :version     => '1.0',
                :url         => 'http://puppetlabs.com',
                :timeout     => 120
-
-      ['push','pull','status'].each do |act|
+       ['push',
+        'pull',
+        'status',
+        'cache',
+        'environment',
+        'module',
+        'synchronize',
+        'sync'].each do |act|
         action act do
           validate :path, :shellsafe
 
@@ -17,21 +23,28 @@ module MCollective
           reply.fail "Path not found #{path}" unless File.exists?(path)
 
           return unless reply.statuscode == 0
-          run_git act, path
+          run_cmd act, path
         end
       end
 
       private
 
-      def run_git(action,path=nil)
+      def run_cmd(action,path=nil)
         output = ''
-        cmd = ['/usr/bin/git']
+        git  = ['/usr/bin/git']
+        r10k = ['/usr/bin/r10k']
         case action
-        when 'push','pull'
-          cmd << 'push' if action == 'push'
-          cmd << 'pull' if action == 'pull'
-        when 'status'
-          cmd << 'status'
+        when 'push','pull','status'
+          cmd = git
+          cmd << 'push'   if action == 'push'
+          cmd << 'pull'   if action == 'pull'
+          cmd << 'status' if action == 'status'
+        when 'cache','environment','module','synchronize','sync'
+          cmd = r10k
+          cmd << 'cache'       if action == 'cache'
+          cmd << 'synchronize' if action == 'synchronize' or 'sync'
+          cmd << 'environment' if action == 'environment'
+          cmd << 'module'      if action == 'module'
         end
         reply[:path] = path
         reply[:status] = run(cmd, :stdout => :output, :chomp => true, :cwd => path )

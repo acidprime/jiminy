@@ -43,6 +43,7 @@ class jiminy (
   $app_path   = $jiminy::params::mc_application_path,
   $mc_service = $jiminy::params::mc_service_name,
   $setup_git  = true,
+  $setup_r10k = true,
   $is_master  = true #str2bool($::fact_is_puppetmaster),
 ) inherits jiminy::params {
 
@@ -75,5 +76,8 @@ class jiminy (
   }
   if $setup_git {
     include jiminy::git
+  }
+  if $setup_r10k {
+    include jiminy::r10k
   }
 }

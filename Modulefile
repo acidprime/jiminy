@@ -8,4 +8,6 @@ description 'UNKNOWN'
 project_page 'UNKNOWN'
 
 ## Add dependencies, if any:
-# dependency 'username/name', '>= 1.2.0'
+dependency 'puppetlabs/stdlib',  '>= 2.0.0'
+dependency 'puppetlabs/ruby',    '>= 0.0.2'
+
