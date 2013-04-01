@@ -35,7 +35,9 @@
 #
 # Copyright 2011 Your name here, unless otherwise noted.
 #
-class jiminy inherits jiminy::params {
+class jiminy {
+
+  include jiminy::params
 
   File {
     ensure => present,
@@ -44,7 +46,7 @@ class jiminy inherits jiminy::params {
     mode   => '0644',
     notify => Service[$jiminy::params::mc_service_name],
   }
-  
+
   $agent_name = "${jiminy::params::mc_agent_name}.rb"
   $agent_ddl  = "${jiminy::params::mc_agent_name}.ddl"
   $agent_path = $jiminy::params::mc_agent_path
@@ -52,8 +54,10 @@ class jiminy inherits jiminy::params {
   file { "${agent_path}/${agent_ddl}"  :
     source => "puppet:///modules/${module_name}/agent/${agent_ddl}",
   }
+
   file { "${agent_path}/${agent_name}" :
-    source => "puppet:///modules/${module_name}/agent/${agent_name}",
+    source  => "puppet:///modules/${module_name}/agent/${agent_name}",
+    require => File["${agent_path}/${agent_ddl}"],
   }
 
   service { $jiminy::params::mc_service_name :
