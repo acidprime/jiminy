@@ -41,6 +41,7 @@ class jiminy (
   $agent_ddl  = "${jiminy::params::mc_agent_name}.ddl",
   $agent_path = $jiminy::params::mc_agent_path,
   $app_path   = $jiminy::params::mc_application_path,
+  $is_master  = str2bool($::fact_is_puppetmaster),
   ) inherits jiminy::params {
 
   File {
@@ -51,21 +52,22 @@ class jiminy (
     notify => Service[$jiminy::params::mc_service_name],
   }
 
-  file { "${app_path}/${app_name}"  :
-    source => "puppet:///modules/${module_name}/application/${agent_name}",
-  }
+  if $is_master {
+    file { "${app_path}/${app_name}"  :
+      source => "puppet:///modules/${module_name}/application/${agent_name}",
+    }
 
-  file { "${agent_path}/${agent_ddl}"  :
-    source => "puppet:///modules/${module_name}/agent/${agent_ddl}",
-  }
+    file { "${agent_path}/${agent_ddl}"  :
+      source => "puppet:///modules/${module_name}/agent/${agent_ddl}",
+    }
 
-  file { "${agent_path}/${agent_name}" :
-    source  => "puppet:///modules/${module_name}/agent/${agent_name}",
-    require => File["${agent_path}/${agent_ddl}"],
-  }
+    file { "${agent_path}/${agent_name}" :
+      source  => "puppet:///modules/${module_name}/agent/${agent_name}",
+      require => File["${agent_path}/${agent_ddl}"],
+    }
 
-  service { $jiminy::params::mc_service_name :
-    ensure => running,
+    service { $jiminy::params::mc_service_name :
+      ensure => running,
+    }
   }
-
 }
