@@ -36,17 +36,19 @@
 # Copyright 2013 Zack Smith, unless otherwise noted.
 #
 class jiminy (
-  $setup_git  = true,
-  $setup_r10k = $setup_git,
-  $repo_path  = $jiminy::params::repo_path,
-  $git_server = $jiminy::params::git_server,
-  $agent_name = $jiminy::params::mc_agent_name,
-  $app_name   = $jiminy::params::mc_app_name,
-  $agent_ddl  = $jiminy::params::mc_agent_ddl_name,
-  $agent_path = $jiminy::params::mc_agent_path,
-  $app_path   = $jiminy::params::mc_application_path,
-  $mc_service = $jiminy::params::mc_service_name,
-  $is_master  = true #str2bool($::fact_is_puppetmaster),
+  $setup_git         = true,
+  $setup_r10k        = $setup_git,
+  $vcs_module_path   = $jiminy::params::vcs_module_path,
+  $dyn_module_path   = $jiminy::params::dyn_module_path,
+  $repo_path         = $jiminy::params::repo_path,
+  $git_server        = $jiminy::params::git_server,
+  $agent_name        = $jiminy::params::mc_agent_name,
+  $app_name          = $jiminy::params::mc_app_name,
+  $agent_ddl         = $jiminy::params::mc_agent_ddl_name,
+  $agent_path        = $jiminy::params::mc_agent_path,
+  $app_path          = $jiminy::params::mc_application_path,
+  $mc_service        = $jiminy::params::mc_service_name,
+  $is_master         = true #str2bool($::fact_is_puppetmaster),
 ) inherits jiminy::params {
 
   # Sanity check
@@ -84,11 +86,7 @@ class jiminy (
   # Unless we are an agent only , install git repos
   if $setup_git {
 
-    class {'jiminy::git':
-      repo_path        => $repo_path,
-      vcs_module_path  => "${::settings::confdir}/${module_name}",
-      git_server       => $git_server,
-    }
+    include jiminy::git
 
     # We automatically setup r10k if we setup git
     if $setup_r10k {

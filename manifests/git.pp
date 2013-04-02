@@ -1,8 +1,9 @@
 class jiminy::git(
-  $git_server,
-  $repo_path         = '/var/repos',
-  $vcs_module_path   = "${::settings::confdir}/${module_name}",
-) {
+  $git_server        = $jiminy::params::git_server,
+  $repo_path         = $jiminy::params::repo_path,
+  $vcs_module_path   = $jiminy::params::vcs_module_path,
+  $dyn_module_path   = $jiminy::params::dyn_module_path,
+) inherits jiminy::params {
   Exec {
     path => '/usr/bin'
   }
@@ -64,10 +65,6 @@ class jiminy::git(
     }
 
     # Configure out dynamic environment module path
-    $dyn_module_path = $::is_pe ? {
-      'true'  => '$confdir/environments/$environment:/opt/puppet/share/puppet/modules',
-      default => '$confdir/environments/$environment',
-    }
     augeas{'puppet.conf modulepath' :
       context => '/files//puppet.conf/main',
       changes => "set modulepath ${dyn_module_path}",
