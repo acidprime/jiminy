@@ -7,8 +7,8 @@ class jiminy::params
   }
 
   $dyn_module_path = $::is_pe ? {
-    'true'  => '$confdir/environments/$environment:/opt/puppet/share/puppet/modules',
-    default => '$confdir/environments/$environment',
+    'true'  => ['/opt/puppet/share/puppet/modules'],
+    default => ['/etc/puppet/modules'],
   }
 
   $mc_agent_name       = "${module_name}.rb"
@@ -20,7 +20,8 @@ class jiminy::params
   $mc_agent_path       = "${plugins_dir}/agent"
   $mc_application_path = "${plugins_dir}/application"
   $vcs_module_path     =  "${::settings::confdir}/${module_name}"
-  $is_master           = true #str2bool($::fact_is_puppetmaster),
+  $is_master_fact      = '::fact_is_puppetca' #fact_is_puppetmaster 2.7.0 testing
+  $is_master           = str2bool(getvar($is_master_fact))
   $setup_git           = true
   $setup_r10k          = $setup_git
   $remote              = "ssh://${git_server}${repo_path}/modules.git"

@@ -36,6 +36,7 @@
 # Copyright 2013 Zack Smith, unless otherwise noted.
 #
 class jiminy (
+  $is_master         = $jiminy::params::is_master,
   $setup_git         = $jiminy::params::setup_git,
   $setup_r10k        = $jiminy::params::setup_r10k,
   $vcs_module_path   = $jiminy::params::vcs_module_path,
@@ -48,13 +49,11 @@ class jiminy (
   $agent_path        = $jiminy::params::mc_agent_path,
   $app_path          = $jiminy::params::mc_application_path,
   $mc_service        = $jiminy::params::mc_service_name,
-  $is_master         = $jiminy::params::is_master,
   $remote            = $jiminy::params::remote,
 ) inherits jiminy::params {
 
-  # Sanity check
-  validate_bool($setup_git)
-  validate_bool($setup_r10k)
+  # Sanity checks
+  include jiminy::sanity
 
   File {
     ensure => present,
