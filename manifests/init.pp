@@ -36,23 +36,29 @@
 # Copyright 2013 Zack Smith, unless otherwise noted.
 #
 class jiminy (
-  $agent_name = "${jiminy::params::mc_agent_name}.rb",
-  $app_name   = "${jiminy::params::mc_app_name}.rb",
-  $agent_ddl  = "${jiminy::params::mc_agent_name}.ddl",
+  $setup_git  = true,
+  $setup_r10k = $setup_git,
+  $repo_path  = $jiminy::params::repo_path,
+  $git_server = $jiminy::params::git_server,
+  $agent_name = $jiminy::params::mc_agent_name,
+  $app_name   = $jiminy::params::mc_app_name,
+  $agent_ddl  = $jiminy::params::mc_agent_ddl_name,
   $agent_path = $jiminy::params::mc_agent_path,
   $app_path   = $jiminy::params::mc_application_path,
   $mc_service = $jiminy::params::mc_service_name,
-  $setup_git  = true,
-  $setup_r10k = true,
   $is_master  = true #str2bool($::fact_is_puppetmaster),
 ) inherits jiminy::params {
+
+  # Sanity check
+  validate_bool($setup_git)
+  validate_bool($setup_r10k)
 
   File {
     ensure => present,
     owner  => 'root',
     group  => 'root',
     mode   => '0644',
-    notify => Service[$jiminy::params::mc_service_name],
+    notify => Service[$mc_service],
   }
 
   if $is_master {
@@ -74,12 +80,21 @@ class jiminy (
       }
     }
   }
+
+  # Unless we are an agent only , install git repos
   if $setup_git {
-    include jiminy::git
-  }
-  if $setup_r10k {
-    class {'jiminy::r10k':
-      remote => "ssh://classroom.puppetlabs.vm/var/repos/modules.git",
+
+    class {'jiminy::git':
+      repo_path        => $repo_path,
+      vcs_module_path  => "${::settings::confdir}/${module_name}",
+      git_server       => $git_server,
+    }
+
+    # We automatically setup r10k if we setup git
+    if $setup_r10k {
+      class {'jiminy::r10k':
+        remote => "ssh://${git_server}${repo_path}/modules.git",
+      }
     }
   }
 }

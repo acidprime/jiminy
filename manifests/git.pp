@@ -1,7 +1,7 @@
 class jiminy::git(
+  $git_server,
   $repo_path         = '/var/repos',
-  $vcs_module_path   = "/etc/puppetlabs/puppet/${module_name}",
-  $git_server        = 'classroom.puppetlabs.vm',
+  $vcs_module_path   = "${::settings::confdir}/${module_name}",
 ) {
   Exec {
     path => '/usr/bin'
