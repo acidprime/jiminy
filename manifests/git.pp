@@ -77,6 +77,17 @@ class jiminy::git(
   else {
     Vcsrepo<<| tag == $module_name |>>{
       revision => 'production',
+      notify   => Exec['r10k sync'],
+    }
+    exec { 'r10k sync':
+      command     => 'r10k synchronize',
+      refreshonly => true,
+      require     => Class['jiminy::r10k'],
+      before      => Augeas['puppet.conf modulepath'],
+    }
+    augeas{'puppet.conf modulepath' :
+      context => '/files//puppet.conf/main',
+      changes => 'set modulepath $confdir/environments/$environment:/opt/puppet/share/puppet/modules',
     }
   }
 
