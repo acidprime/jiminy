@@ -3,6 +3,9 @@ class jiminy::git(
   $vcs_module_path   = "/etc/puppetlabs/puppet/${module_name}",
   $git_server        = 'classroom.puppetlabs.vm',
 ) {
+  Exec {
+    path => '/usr/bin'
+  }
 
   if ! defined(Package['git']) {
     package { 'git':
@@ -20,14 +23,61 @@ class jiminy::git(
     ensure => directory,
   }
 
-  jiminy::git::repo{ 'modules': }
+  jiminy::git::repo{ 'modules':}
 
-  vcsrepo { $vcs_module_path :
-      ensure   => present,
-      provider => 'git',
-      force    => true,
-      source   => "ssh://${git_server}/${repo_path}/modules.git",
-      require  => Package['git'],
+  # hacky must refactor
+
+  if $::fqdn == $git_server {
+    # Export & Collect on the git server
+    @@vcsrepo { $vcs_module_path :
+        ensure   => present,
+        provider => 'git',
+        force    => true,
+        source   => "ssh://${git_server}/${repo_path}/modules.git",
+        tag      => $module_name,
+        require  => Package['git'],
+    }
+    Vcsrepo<<| tag == $module_name |>>
+
+    file { "${vcs_module_path}/.gitignore":
+      ensure  => file,
+      notify  => Exec['git add .gitignore'],
+      require => Vcsrepo[$vcs_module_path],
+    }
+    exec { 'git add .gitignore':
+      command     => 'git add .gitignore',
+      cwd         => $vcs_module_path,
+      refreshonly => true,
+      notify      => Exec['intial commit'],
+    }
+    exec { 'intial commit':
+      command     => 'git commit .gitignore -m "intial commit"',
+      cwd         => $vcs_module_path,
+      refreshonly => true,
+      notify      => Exec['push origin master'],
+    }
+    exec { 'push origin master':
+      command     => 'git push origin master',
+      cwd         => $vcs_module_path,
+      refreshonly => true,
+      before      => Exec['create production branch'],
+    }
+    exec { 'create production branch':
+      command => 'git branch production',
+      cwd     => "${repo_path}/modules.git",
+      creates => "${repo_path}/modules.git/refs/heads/production",
+      notify  => Exec['change HEAD to production'],
+    }
+    exec { 'change HEAD to production':
+      command     => 'git symbolic-ref HEAD refs/heads/production',
+      cwd         => "${repo_path}/modules.git",
+      refreshonly => true,
+    }
+  }
+  else {
+    Vcsrepo<<| tag == $module_name |>>{
+      revision => 'production',
+    }
   }
 
   file { '.git/hooks/pre-commit':
