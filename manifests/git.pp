@@ -44,6 +44,14 @@ class jiminy::git(
       notify  => Exec['git add .gitignore'],
       require => Vcsrepo[$vcs_module_path],
     }
+
+    file {'post-receive':
+      ensure  => file,
+      path    => "${repo_path}/modules.git/hooks/post-receive",
+      source  => "puppet:///modules/${module_name}/post-receive",
+      require => Vcsrepo[$vcs_module_path],
+    }
+
     exec { 'git add .gitignore':
       command     => 'git add .gitignore',
       cwd         => $vcs_module_path,
