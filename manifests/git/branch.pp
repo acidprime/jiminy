@@ -1,7 +1,14 @@
+# This class automatically create the production branch
+# I find this kind of hacky but atm it works for my purposes
 class jiminy::git::branch(
   $repo_path,
   $vcs_module_path,
 ) {
+    file { "${vcs_module_path}/.gitignore":
+      ensure  => file,
+      notify  => Exec['git add .gitignore'],
+      require => Vcsrepo[$vcs_module_path],
+    }
     exec { 'git add .gitignore':
       command     => 'git add .gitignore',
       cwd         => $vcs_module_path,
