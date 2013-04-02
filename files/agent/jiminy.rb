@@ -24,6 +24,7 @@ module MCollective
 
           return unless reply.statuscode == 0
           run_cmd act, path
+          reply[:path]   = path
         end
       end
 
@@ -46,7 +47,6 @@ module MCollective
           cmd << 'environment' if action == 'environment'
           cmd << 'module'      if action == 'module'
         end
-        reply[:path]   = path
         reply[:status] = run(cmd, :stderr => :error, :stdout => :output, :chomp => true, :cwd => path )
       end
     end

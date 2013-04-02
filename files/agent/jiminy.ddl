@@ -15,19 +15,19 @@ metadata :name        => "jiminy",
    'synchronize',
    'sync'].each do |act|
   action act, :description => "#{act.capitalize} " do
-    input :path,
-          :prompt      => "Module path",
-          :description => "Operating on #{act}",
-          :type        => :string,
-          :validation  => '.',
-          :optional    => false,
-          :maxlength   => 256
+    if ['push','pull','status'].include? action
+      input :path,
+            :prompt      => "Module path",
+            :description => "Operating on #{act}",
+            :type        => :string,
+            :validation  => '.',
+            :optional    => false,
+            :maxlength   => 256
 
-    display :always
-    output :path,
-           :description => "Operating on #{act}",
-           :display_as  => "Path"
-
+      output :path,
+             :description => "Operating on #{act}",
+             :display_as  => "Path"
+    end
     output :output,
            :description => "Output from git",
            :display_as  => "Output"
@@ -35,6 +35,7 @@ metadata :name        => "jiminy",
     output :error,
            :description => "Error from git",
            :display_as  => "Errors"
+    display :always
   end
 end
 # vim: set syntax=ruby:
