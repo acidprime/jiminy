@@ -9,9 +9,9 @@ class jiminy::r10k(
   # https://projects.puppetlabs.com/issues/19741
   class {'ruby':
     rubygems_update => false,
-  }
+  } ->
+  class { 'ruby::dev':}
 
-  include 'ruby::dev'
   if ! defined(Package['r10k']) {
     package { 'r10k':
       ensure   => present,
