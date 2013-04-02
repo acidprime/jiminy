@@ -1,6 +1,7 @@
 class jiminy::git::ssh(
-  $git_server,
-) {
+  $git_server      = $jiminy::params::git_server,
+  $vcs_module_path = $jiminy::params::vcs_module_path,
+) inherits jiminy::params {
 
   Exec {
     path => '/usr/bin:/bin:/user/sbin:/usr/sbin',

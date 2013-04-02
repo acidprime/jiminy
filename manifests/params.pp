@@ -20,4 +20,8 @@ class jiminy::params
   $mc_agent_path       = "${plugins_dir}/agent"
   $mc_application_path = "${plugins_dir}/application"
   $vcs_module_path     =  "${::settings::confdir}/${module_name}"
+  $is_master           = true #str2bool($::fact_is_puppetmaster),
+  $setup_git           = true
+  $setup_r10k          = $setup_git
+  $remote              = "ssh://${git_server}${repo_path}/modules.git"
 }

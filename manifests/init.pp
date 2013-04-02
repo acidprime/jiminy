@@ -36,8 +36,8 @@
 # Copyright 2013 Zack Smith, unless otherwise noted.
 #
 class jiminy (
-  $setup_git         = true,
-  $setup_r10k        = $setup_git,
+  $setup_git         = $jiminy::params::setup_git,
+  $setup_r10k        = $jiminy::params::setup_r10k,
   $vcs_module_path   = $jiminy::params::vcs_module_path,
   $dyn_module_path   = $jiminy::params::dyn_module_path,
   $repo_path         = $jiminy::params::repo_path,
@@ -48,7 +48,8 @@ class jiminy (
   $agent_path        = $jiminy::params::mc_agent_path,
   $app_path          = $jiminy::params::mc_application_path,
   $mc_service        = $jiminy::params::mc_service_name,
-  $is_master         = true #str2bool($::fact_is_puppetmaster),
+  $is_master         = $jiminy::params::is_master,
+  $remote            = $jiminy::params::remote,
 ) inherits jiminy::params {
 
   # Sanity check
@@ -64,6 +65,8 @@ class jiminy (
   }
 
   if $is_master {
+
+    # Install the agent and its ddl file
     file { "${app_path}/${app_name}"  :
       source => "puppet:///modules/${module_name}/application/${agent_name}",
     }
@@ -72,10 +75,13 @@ class jiminy (
       source => "puppet:///modules/${module_name}/agent/${agent_ddl}",
     }
 
+    # Install the application file
     file { "${agent_path}/${agent_name}" :
       source  => "puppet:///modules/${module_name}/agent/${agent_name}",
       require => File["${agent_path}/${agent_ddl}"],
     }
+
+    # Create a service resource for the notification
     if ! defined(Service[$mc_service]) {
       service { $mc_service :
         ensure => running,

@@ -3,20 +3,22 @@ class jiminy::git(
   $repo_path         = $jiminy::params::repo_path,
   $vcs_module_path   = $jiminy::params::vcs_module_path,
   $dyn_module_path   = $jiminy::params::dyn_module_path,
+  $remote            = $jiminy::params::remote,
 ) inherits jiminy::params {
+
   Exec {
     path => '/usr/bin'
+  }
+
+  Jiminy::Git::Repo {
+    repo_path => $repo_path,
+    require   => File[$repo_path],
   }
 
   if ! defined(Package['git']) {
     package { 'git':
       ensure => present,
     }
-  }
-
-  Jiminy::Git::Repo {
-    repo_path => $repo_path,
-    require   => File[$repo_path],
   }
 
   # Create our repository path
@@ -47,10 +49,9 @@ class jiminy::git(
       source  => "puppet:///modules/${module_name}/post-receive",
       require => Vcsrepo[$vcs_module_path],
     }
-    class { 'jiminy::git::branch' :
-      repo_path       => $repo_path,
-      vcs_module_path => $vcs_module_path,
-    }
+
+    # Setup the intial commit & production branch
+    include jiminy::git::branch
   }
   else {
     Vcsrepo<<| tag == $module_name |>>{
@@ -87,8 +88,5 @@ class jiminy::git(
     }
   }
 
-  # TODO:enable store configs
-  class { 'jiminy::git::ssh':
-    git_server => $git_server,
-  }
+  include jiminy::git::ssh
 }
