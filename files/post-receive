@@ -17,6 +17,6 @@ stdins.each do |str|
   newrev   = arr[1] # SHA
   ref_type = refs[1] # tags || heads (branch)
   ref_name = refs[2] # develop, 1.4 etc.
-  system("mco rcp jiminy sync path=/etc/puppetlabs/puppet/environments")
+  system('mco jiminy synchronize')
   # now do whatcha gotta do
 end
