@@ -62,9 +62,15 @@ class jiminy::git(
       require     => Class['jiminy::r10k'],
       before      => Augeas['puppet.conf modulepath'],
     }
+
+    # Configure out dynamic environment module path
+    $dyn_module_path = $::is_pe ? {
+      'true'  => '$confdir/environments/$environment:/opt/puppet/share/puppet/modules',
+      default => '$confdir/environments/$environment',
+    }
     augeas{'puppet.conf modulepath' :
       context => '/files//puppet.conf/main',
-      changes => 'set modulepath $confdir/environments/$environment:/opt/puppet/share/puppet/modules',
+      changes => "set modulepath ${dyn_module_path}",
     }
   }
 
