@@ -39,12 +39,6 @@ class jiminy::git(
     }
     Vcsrepo<<| tag == $module_name |>>
 
-    file { "${vcs_module_path}/.gitignore":
-      ensure  => file,
-      notify  => Exec['git add .gitignore'],
-      require => Vcsrepo[$vcs_module_path],
-    }
-
     file {'post-receive':
       ensure  => file,
       mode    => '0755',
