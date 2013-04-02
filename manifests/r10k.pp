@@ -1,10 +1,10 @@
 class jiminy::r10k(
-  $remote,
+  $remote     = $jiminy::params::remote,
   $purgedirs  = $basedir,
   $cachedir   = '/var/cache/r10k',
   $basedir    = "${::settings::confdir}/environments",
   $configfile = '/etc/r10k.yaml'
-){
+) inherits jiminy::params {
   Class['ruby'] -> Class['ruby::dev'] -> Package['gcc']
 
   # rubygems_update => false

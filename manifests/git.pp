@@ -10,26 +10,6 @@ class jiminy::git(
     path => '/usr/bin'
   }
 
-  Jiminy::Git::Repo {
-    repo_path => $repo_path,
-    require   => File[$repo_path],
-  }
-
-  if ! defined(Package['git']) {
-    package { 'git':
-      ensure => present,
-    }
-  }
-
-  # Create our repository path
-  file { $repo_path :
-    ensure => directory,
-  }
-
-  jiminy::git::repo{ 'modules':}
-
-  # hacky must refactor
-
   if $::fqdn == $git_server {
     # Export & Collect on the git server
     @@vcsrepo { $vcs_module_path :
@@ -57,20 +37,11 @@ class jiminy::git(
     # Once collected & complete setup ./environments using r10k
     Vcsrepo<<| tag == $module_name |>>{
       revision     => 'production',
-      notify       => Exec['r10k sync'],
-      before       => Augeas['puppet.conf modulepath'],
-    }
-    exec { 'r10k sync':
-      command     => 'r10k synchronize',
-      refreshonly => true,
+      notify       => Class['jiminy::r10k::sync'],
     }
 
-    # Configure out dynamic environment module path
-    augeas{'puppet.conf modulepath' :
-      context       => '/files//puppet.conf/main',
-      changes       => "set modulepath ${dyn_module_path}",
-      require => Class['jiminy::r10k'],
-    }
+    # Setup our dynamic environments with r10k
+    include jiminy::r10k::sync
 
     # Setup our pre-commit hook in our jiminy repo
     include jiminy::git::pre_commit
@@ -78,4 +49,23 @@ class jiminy::git(
 
   # Configure ssh keys on all machines
   include jiminy::git::ssh
+
+  Jiminy::Git::Repo {
+    repo_path => $repo_path,
+    require   => File[$repo_path],
+  }
+
+  jiminy::git::repo{ 'modules':}
+
+  if ! defined(Package['git']) {
+    package { 'git':
+      ensure => present,
+    }
+  }
+
+  # Create our repository path
+  file { $repo_path :
+    ensure => directory,
+  }
+
 }

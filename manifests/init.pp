@@ -91,14 +91,12 @@ class jiminy (
 
   # Unless we are an agent only , install git repos
   if $setup_git {
-
+    # Automatically setup remote & local repos on all systems
     include jiminy::git
 
     # We automatically setup r10k if we setup git
     if $setup_r10k {
-      class {'jiminy::r10k':
-        remote => "ssh://${git_server}${repo_path}/modules.git",
-      }
+      include jiminy::r10k
     }
   }
 }
