@@ -36,17 +36,15 @@ class jiminy::git(
         ensure   => present,
         provider => 'git',
         force    => true,
-        source   => "ssh://${git_server}/${repo_path}/modules.git",
+        source   => $remote,
         tag      => $module_name,
         require  => Package['git'],
     }
     Vcsrepo<<| tag == $module_name |>>
 
-    file {'post-receive':
-      ensure  => file,
-      mode    => '0755',
-      path    => "${repo_path}/modules.git/hooks/post-receive",
-      source  => "puppet:///modules/${module_name}/post-receive",
+    # Setup post-receive where the magic happens
+    # with the jiminy mcollective agent
+    class {'jiminy::git::post_receive':
       require => Vcsrepo[$vcs_module_path],
     }
 
@@ -54,39 +52,30 @@ class jiminy::git(
     include jiminy::git::branch
   }
   else {
+
+    # Clone the production branch of the jiminy repo
+    # Once collected & complete setup ./environments using r10k
     Vcsrepo<<| tag == $module_name |>>{
-      revision => 'production',
-      notify   => Exec['r10k sync'],
+      revision     => 'production',
+      notify       => Exec['r10k sync'],
+      before       => Augeas['puppet.conf modulepath'],
     }
     exec { 'r10k sync':
       command     => 'r10k synchronize',
       refreshonly => true,
-      require     => Class['jiminy::r10k'],
-      before      => Augeas['puppet.conf modulepath'],
     }
 
     # Configure out dynamic environment module path
     augeas{'puppet.conf modulepath' :
-      context => '/files//puppet.conf/main',
-      changes => "set modulepath ${dyn_module_path}",
+      context       => '/files//puppet.conf/main',
+      changes       => "set modulepath ${dyn_module_path}",
+      require => Class['jiminy::r10k'],
     }
+
+    # Setup our pre-commit hook in our jiminy repo
+    include jiminy::git::pre_commit
   }
 
-  file { '.git/hooks/pre-commit':
-    ensure  => file,
-    mode    => '0755',
-    path    => "${vcs_module_path}/.git/hooks/pre-commit",
-    source  => "puppet:///modules/${module_name}/pre-commit",
-    require => Vcsrepo[$vcs_module_path],
-  }
-
-  if ! defined(Package['puppet-lint']) {
-    package { 'puppet-lint':
-      ensure   => present,
-      provider => 'gem',
-      require  => [Class['ruby'],Class['ruby::dev']],
-    }
-  }
-
+  # Configure ssh keys on all machines
   include jiminy::git::ssh
 }

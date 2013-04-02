@@ -1,3 +1,0 @@
-class jiminy::git::hooks {
-
-}
