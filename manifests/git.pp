@@ -9,7 +9,9 @@ class jiminy::git(
   Exec {
     path => '/usr/bin'
   }
-
+  #############################################################################
+  # Configure our git server
+  #############################################################################
   if $::fqdn == $git_server {
     # Export & Collect on the git server
     @@vcsrepo { $vcs_module_path :
@@ -31,10 +33,14 @@ class jiminy::git(
     # Setup the intial commit & production branch
     include jiminy::git::branch
   }
+  #############################################################################
+  # Configure our git clients on all non git servers
+  #############################################################################
   else {
 
     # Clone the production branch of the jiminy repo
     # Once collected & complete setup ./environments using r10k
+    # This collection happens a little differently  in that we clone the prod b
     Vcsrepo<<| tag == $module_name |>>{
       revision     => 'production',
       notify       => Class['jiminy::r10k::sync'],
@@ -50,12 +56,11 @@ class jiminy::git(
   # Configure ssh keys on all machines
   include jiminy::git::ssh
 
-  Jiminy::Git::Repo {
+  # This is a one shot define for the time being
+  jiminy::git::repo{ 'modules':
     repo_path => $repo_path,
     require   => File[$repo_path],
   }
-
-  jiminy::git::repo{ 'modules':}
 
   if ! defined(Package['git']) {
     package { 'git':

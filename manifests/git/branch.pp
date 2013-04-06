@@ -4,6 +4,7 @@ class jiminy::git::branch(
   $repo_path       = $jiminy::params::repo_path,
   $vcs_module_path = $jiminy::params::vcs_module_path,
 ) inherits jiminy::params {
+
   Exec {
     path => '/usr/bin'
   }
@@ -14,7 +15,7 @@ class jiminy::git::branch(
     require => Vcsrepo[$vcs_module_path],
   }
 
-  exec { 'git add .gitignore':
+  exec { 'add .gitignore':
     command     => 'git add .gitignore',
     cwd         => $vcs_module_path,
     refreshonly => true,

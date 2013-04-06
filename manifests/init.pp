@@ -1,25 +1,20 @@
 # == Class: jiminy
 #
-# Full description of class jiminy here.
+# This class automatically configures a set of puppet masters with r10k
 #
 # === Parameters
 #
 # Document parameters here.
 #
-# [*sample_parameter*]
-#   Explanation of what this parameter affects and what it defaults to.
-#   e.g. "Specify one or more upstream ntp servers as an array."
+# [*is_master*]
+#   boolean , determine if the system is a master using this boolean
 #
 # === Variables
 #
 # Here you should define a list of variables that this module would require.
 #
-# [*sample_variable*]
-#   Explanation of how this variable affects the funtion of this class and if it
-#   has a default. e.g. "The parameter enc_ntp_servers must be set by the
-#   External Node Classifier as a comma separated list of hostnames." (Note,
-#   global variables should not be used in preference to class parameters  as of
-#   Puppet 2.6.)
+# [*setup_git*]
+#  Should this module setup a bare git repo on the git_server (ca_server)
 #
 # === Examples
 #
@@ -74,7 +69,7 @@ class jiminy (
       source => "puppet:///modules/${module_name}/agent/${agent_ddl}",
     }
 
-    # Install the application file
+    # Install the application file (all masters at the moment)
     file { "${agent_path}/${agent_name}" :
       source  => "puppet:///modules/${module_name}/agent/${agent_name}",
       require => File["${agent_path}/${agent_ddl}"],
@@ -88,12 +83,12 @@ class jiminy (
     }
   }
 
-  # Unless we are an agent only , install git repos
+  # Unless we are a puppet agent , install git repos
   if $setup_git {
     # Automatically setup remote & local repos on all systems
     include jiminy::git
 
-    # We automatically setup r10k if we setup git
+    # We automatically setup r10k if we setup git atm
     if $setup_r10k {
       include jiminy::r10k
     }

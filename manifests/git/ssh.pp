@@ -12,6 +12,8 @@ class jiminy::git::ssh(
     ensure => directory,
     mode   => '0600',
   }
+
+  # Generate a new key pair on all systems
   exec { 'generate_key':
     command => 'ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa',
     creates => '/root/.ssh/id_rsa',
@@ -22,7 +24,7 @@ class jiminy::git::ssh(
   if $::fqdn == $git_server {
     @@sshkey { $::hostname :
       ensure          => present,
-      host_aliases    => [$::fqdn, $::ipaddress ],
+      host_aliases    => [$::fqdn, $::ipaddress],
       type            => 'rsa',
       key             => $::sshrsakey,
       tag             => $module_name,
@@ -33,6 +35,7 @@ class jiminy::git::ssh(
     }
   }
 
+  # If the public key has been found by the fact, export it
   if $::root_ssh_key {
      @@ssh_authorized_key { $::fqdn :
        key     => $::root_ssh_key,
