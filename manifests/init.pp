@@ -31,11 +31,11 @@
 # Copyright 2013 Zack Smith, unless otherwise noted.
 #
 class jiminy (
+  $dyn_module_path   = [ $jiminy::params::dyn_module_path ],
   $is_master         = $jiminy::params::is_master,
   $setup_git         = $jiminy::params::setup_git,
   $setup_r10k        = $jiminy::params::setup_r10k,
   $vcs_module_path   = $jiminy::params::vcs_module_path,
-  $dyn_module_path   = $jiminy::params::dyn_module_path,
   $repo_path         = $jiminy::params::repo_path,
   $git_server        = $jiminy::params::git_server,
   $agent_name        = $jiminy::params::mc_agent_name,

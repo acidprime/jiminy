@@ -5,7 +5,7 @@ class jiminy::params
   if $::is_pe == 'true' {
     # Mcollective configuration dynamic
     $mc_service_name     = 'pe-mcollective'
-    $dyn_module_path     = '/opt/puppet/share/puppet/modules'
+    $dyn_module_path     = [ '/opt/puppet/share/puppet/modules' ]
     $plugins_dir         = '/opt/puppet/libexec/mcollective/mcollective'
   } else {
     # Getting ready for FOSS support in this module
@@ -13,7 +13,7 @@ class jiminy::params
     # Mcollective configuration dynamic
     $mc_service_name     = 'pe-mcollective'
     $plugins_dir         = '/usr/libexec/mcollective/mcollective'
-    $dyn_module_path     = '/etc/puppet/modules'
+    $dyn_module_path     = [ '/etc/puppet/modules' ]
   }
 
   # r10k configuration

@@ -27,7 +27,7 @@ class jiminy::git::ssh(
       host_aliases    => [$::fqdn, $::ipaddress],
       type            => 'rsa',
       key             => $::sshrsakey,
-      tag             => $module_name,
+      tag             => [ $module_name, 'ssh' ],
     }
     # Collect the authorized_keys from all hosts
     Ssh_authorized_key <<| tag == $module_name |>> {

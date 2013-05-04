@@ -11,7 +11,7 @@ class jiminy::git::branch(
 
   file { "${vcs_module_path}/.gitignore":
     ensure  => file,
-    notify  => Exec['git add .gitignore'],
+    notify  => Exec['add .gitignore'],
     require => Vcsrepo[$vcs_module_path],
   }
 

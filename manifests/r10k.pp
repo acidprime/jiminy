@@ -16,7 +16,7 @@ class jiminy::r10k(
     rubygems_update => false,
   }
   class { 'ruby::dev':
-    tag => 'needed?',
+    tag => 'needed',
   }
 
   # I am not sure this is required as I assumed the
